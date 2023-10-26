@@ -5,9 +5,9 @@
     background-size: cover;
     display: inline-block;
 }
-.dot{
+.mark1{
     background-image: url(images//dot.png);
 }
-.cross{
+.mark2{
     background-image: url(images//cross.png);
 }
