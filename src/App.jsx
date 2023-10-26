@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 
@@ -15,10 +15,38 @@ function App() {
 
 function Board(){
   const [marks, setMarks] = useState([0,0,0,0,0,0,0,0,0]);
+  const [player, setPlayer] = useState(1);
+
+  useEffect(() => {
+    const combinations = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8],
+      [0,3,6],
+      [1,4,7],
+      [2,5,8],
+      [0,4,8],
+      [2,4,6],
+    ]
+
+    for (let c of combinations) {
+      if(marks[c[0]] ===1  && marks[c[1]] ===1 && marks[c[2]] ===1){
+        alert("player 1 wins")
+      }
+      if(marks[c[0]] ===2  && marks[c[1]] ===2 && marks[c[2]] ===2){
+        alert("player 2 wins")
+      }
+    }
+
+  }, [marks])
+
   const changeMark = (i)=>{
     const m =[...marks];
-    m[i] = 1;
+    if(m[i]===0) {
+      m[i] = player;
     setMarks(m);
+    setPlayer(player===1 ? 2:1);
+    } 
   }
 
   return (
