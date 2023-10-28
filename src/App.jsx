@@ -1,53 +1,102 @@
-import { useEffect, useState } from 'react';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import { Connect, Provider, connect } from "react-redux";
+import { createStore } from "redux";
 
+const initial_state = {
+  marks : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  player : 1,
+  gameOver: false
+};
+
+const reducer = (state = initial_state, action) =>{
+  switch (action.type) {
+    case 'SET_PLAYER':
+      return {...state, player: action.payload}
+    case 'SET_MARKS' :
+      return{...state, marks: action.payload}
+    case 'SET_GAMEOVER' :
+      return{...state, gameOver: action.payload}
+    default:
+      return state;
+  }
+};
+
+const store = createStore(reducer);
 
 function App() {
-
   return (
     <>
-      <div className='App'>
-        <Board />
+      <div className="App">
+      <Provider store={store}>
+        <BoardContainer></BoardContainer>
+      </Provider>
       </div>
     </>
-  )
+  );
 }
 
-function Board(){
-  const [marks, setMarks] = useState([0,0,0,0,0,0,0,0,0]);
-  const [player, setPlayer] = useState(1);
+const mapStateToProps = (state)=> {
+  return{
+    marks: state.marks,
+    player: state.player,
+    gameOver: state.gameOver
+  }
+}
+
+const mapDispatchToProps = (dispatch)=> {
+  return {
+    setMarks: (marks)=> {
+      dispatch({type: 'SET_MARKS', payload:marks})
+    }, 
+    setPlayer: (player)=> {
+      dispatch({type: 'SET_PLAYER' , payload:player})
+    },
+    setGameover: (status)=> {
+      dispatch({type: 'SET_PLAYER' , payload:status})
+    }
+  }
+}
+
+const BoardContainer = connect(mapStateToProps, mapDispatchToProps) (Board);
+
+
+function Board({marks, player, gameOver, setGameover, setMarks, setPlayer}) {
+  // const [marks, setMarks] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  // const [player, setPlayer] = useState(1);
 
   useEffect(() => {
     const combinations = [
-      [0,1,2],
-      [3,4,5],
-      [6,7,8],
-      [0,3,6],
-      [1,4,7],
-      [2,5,8],
-      [0,4,8],
-      [2,4,6],
-    ]
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
 
     for (let c of combinations) {
-      if(marks[c[0]] ===1  && marks[c[1]] ===1 && marks[c[2]] ===1){
-        alert("player 1 wins")
+      if (marks[c[0]] === 1 && marks[c[1]] === 1 && marks[c[2]] === 1) {
+        alert("player 1 wins");
+        setGameover(true)
       }
-      if(marks[c[0]] ===2  && marks[c[1]] ===2 && marks[c[2]] ===2){
-        alert("player 2 wins")
+      if (marks[c[0]] === 2 && marks[c[1]] === 2 && marks[c[2]] === 2) {
+        alert("player 2 wins");
+        setGameover(true)
       }
     }
+  }, [marks]);
 
-  }, [marks])
-
-  const changeMark = (i)=>{
-    const m =[...marks];
-    if(m[i]===0) {
+  const changeMark = (i) => {
+    const m = [...marks];
+    if (m[i] === 0 && !gameOver) {
       m[i] = player;
-    setMarks(m);
-    setPlayer(player===1 ? 2:1);
-    } 
-  }
+      setMarks(m);
+      setPlayer(player === 1 ? 2 : 1);
+    }
+  };
 
   return (
     <div className="Board">
@@ -67,14 +116,16 @@ function Board(){
         <Block mark={marks[8]} position={8} changeMark={changeMark} />
       </div>
     </div>
-  )
+  );
 }
 
-function Block({mark, changeMark, position}) {
-  return <div className= {`Block mark${mark}`} 
-          onClick={e=> changeMark(position)}>
-  </div>
+function Block({ mark, changeMark, position }) {
+  return (
+    <div
+      className={`Block mark${mark}`}
+      onClick={(e) => changeMark(position)}
+    ></div>
+  );
 }
 
 export default App;
-
